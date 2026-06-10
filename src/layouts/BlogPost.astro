@@ -1,9 +1,10 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+import Navbar1 from '../components/starwind-pro/navbar-01/Navbar1.astro';
+import Footer1 from '../components/starwind-pro/footer-01/Footer1.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import "../styles/starwind.css";
 
 type Props = CollectionEntry<'blog'>['data'];
 
@@ -54,8 +55,8 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		</style>
 	</head>
 
-	<body>
-		<Header />
+	<body class="base-body">
+		<Navbar1 />
 		<main>
 			<article>
 				<div class="hero-image">
@@ -80,6 +81,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				</div>
 			</article>
 		</main>
-		<Footer />
+		<Footer1 />
 	</body>
 </html>

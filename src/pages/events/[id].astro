@@ -1,0 +1,119 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import { Image } from "astro:assets";
+import Layout from "../../layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const events = await getCollection("events");
+  return events.map((event) => ({ params: { id: event.id } }));
+}
+
+const { id } = Astro.params;
+const event = await getEntry("events", id!);
+if (!event) return Astro.redirect("/events");
+
+const { title, date, description, image, status, gallery } = event.data;
+---
+
+<Layout title={title} description={description} wide>
+  <div class="max-w-4xl mx-auto px-4 py-12">
+
+    <!-- Hero image -->
+    <div class="w-full aspect-video rounded-2xl overflow-hidden bg-muted mb-8">
+      {image ? (
+        <Image src={image} alt={title} width={800} height={450} class="w-full h-full object-cover" />
+      ) : (
+        <div class="w-full h-full flex items-center justify-center text-6xl text-muted-foreground">📅</div>
+      )}
+    </div>
+
+    <!-- Meta + title -->
+    <div class="flex items-center gap-3 mb-4">
+      <span class={`text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full ${status === "upcoming" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+        {status}
+      </span>
+      <span class="text-sm text-muted-foreground font-medium">
+        {date.toLocaleDateString("en-BW", { dateStyle: "long" })}
+      </span>
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-bold text-foreground mb-6 leading-tight">{title}</h1>
+    <p class="text-muted-foreground leading-relaxed text-base sm:text-lg mb-12">{description}</p>
+
+    <!-- Gallery -->
+    <div>
+      <h2 class="text-2xl font-semibold text-foreground mb-6">Photos</h2>
+      {!gallery || gallery.length === 0 ? (
+        <p class="text-muted-foreground italic">Images will be uploaded soon.</p>
+      ) : (
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {gallery.map((src, i) => (
+            <button
+              class="gallery-thumb rounded-xl overflow-hidden aspect-square bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
+              data-index={i}
+              aria-label={`View photo ${i + 1}`}
+            >
+              <Image src={src} alt={`${title} photo ${i + 1}`} width={400} height={400} class="w-full h-full object-cover hover:scale-105 transition-transform duration-200" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  {gallery && gallery.length > 0 && (
+    <div id="lightbox" aria-hidden="true" class="hidden fixed inset-0 bg-black/90 z-50 items-center justify-center">
+      <button id="lb-close" aria-label="Close" class="absolute top-5 right-6 text-white text-3xl leading-none opacity-70 hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer">✕</button>
+      <button id="lb-prev" aria-label="Previous" class="absolute left-2 top-1/2 -translate-y-1/2 text-white text-6xl leading-none opacity-70 hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer px-4">‹</button>
+      <div class="max-w-[90vw] max-h-[85vh] flex items-center justify-center">
+        <img id="lb-img" src="" alt="" class="max-w-full max-h-[85vh] object-contain rounded-lg" />
+      </div>
+      <button id="lb-next" aria-label="Next" class="absolute right-2 top-1/2 -translate-y-1/2 text-white text-6xl leading-none opacity-70 hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer px-4">›</button>
+    </div>
+  )}
+</Layout>
+
+{gallery && gallery.length > 0 && (
+  <script define:vars={{ gallery }}>
+    const lightbox = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lb-img");
+    let current = 0;
+
+    function open(i) {
+      current = i;
+      lbImg.src = gallery[current];
+      lightbox.classList.remove("hidden");
+      lightbox.classList.add("flex");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function close() {
+      lightbox.classList.add("hidden");
+      lightbox.classList.remove("flex");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function prev() { open((current - 1 + gallery.length) % gallery.length); }
+    function next() { open((current + 1) % gallery.length); }
+
+    document.querySelectorAll(".gallery-thumb").forEach((btn) => {
+      btn.addEventListener("click", () => open(Number(btn.dataset.index)));
+    });
+
+    document.getElementById("lb-close").addEventListener("click", close);
+    document.getElementById("lb-prev").addEventListener("click", prev);
+    document.getElementById("lb-next").addEventListener("click", next);
+
+    lightbox.addEventListener("click", (e) => { if (e.target === lightbox) close(); });
+
+    document.addEventListener("keydown", (e) => {
+      if (lightbox.classList.contains("hidden")) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    });
+  </script>
+)}

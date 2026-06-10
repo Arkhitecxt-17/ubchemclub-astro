@@ -1,0 +1,106 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import Layout from "../../layouts/Layout.astro";
+
+const allEvents = await getCollection("events");
+const upcoming = allEvents
+  .filter((e) => e.data.status === "upcoming")
+  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+const past = allEvents
+  .filter((e) => e.data.status === "past")
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<Layout title="Events" description="Upcoming and past UBCC events" wide>
+  <div class="max-w-6xl mx-auto px-4 py-12">
+
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-foreground mb-3">Events</h1>
+      <p class="text-muted-foreground text-lg">Stay up to date with what the Chemistry Club is up to.</p>
+    </div>
+
+    <input type="radio" name="events-tab" id="etab-upcoming" class="hidden" checked />
+    <input type="radio" name="events-tab" id="etab-past" class="hidden" />
+
+    <div class="etab-bar flex justify-center border-b border-border mb-10">
+      <label for="etab-upcoming" class="etab-label px-8 py-3 text-base font-medium cursor-pointer text-muted-foreground border-b-2 border-transparent -mb-px transition-colors hover:text-foreground">Upcoming</label>
+      <label for="etab-past" class="etab-label px-8 py-3 text-base font-medium cursor-pointer text-muted-foreground border-b-2 border-transparent -mb-px transition-colors hover:text-foreground">Past</label>
+    </div>
+
+    <div class="etab-panels">
+
+      <div class="etab-panel panel-upcoming">
+        {upcoming.length === 0 ? (
+          <p class="text-center text-muted-foreground py-16">No upcoming events at the moment. Check back soon.</p>
+        ) : (
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {upcoming.map((event) => (
+              <a href={`/events/${event.id}`} class="group flex flex-col border border-border rounded-xl overflow-hidden hover:border-muted-foreground/50 hover:shadow-lg transition-all duration-200 no-underline text-inherit">
+                <div class="relative aspect-video bg-muted overflow-hidden">
+                  {event.data.image ? (
+                    <Image src={event.data.image} alt={event.data.title} width={800} height={450} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center text-4xl text-muted-foreground">📅</div>
+                  )}
+                  <span class="absolute top-3 right-3 bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full">Upcoming</span>
+                </div>
+                <div class="p-5 flex flex-col gap-2 flex-1">
+                  <p class="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                    {event.data.date.toLocaleDateString("en-BW", { dateStyle: "long" })}
+                  </p>
+                  <h2 class="text-lg font-semibold text-foreground leading-snug">{event.data.title}</h2>
+                  <p class="text-sm text-muted-foreground leading-relaxed line-clamp-2">{event.data.description}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div class="etab-panel panel-past">
+        {past.length === 0 ? (
+          <p class="text-center text-muted-foreground py-16">No past events recorded yet.</p>
+        ) : (
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {past.map((event) => (
+              <a href={`/events/${event.id}`} class="group flex flex-col border border-border rounded-xl overflow-hidden hover:border-muted-foreground/50 hover:shadow-lg transition-all duration-200 no-underline text-inherit">
+                <div class="relative aspect-video bg-muted overflow-hidden">
+                  {event.data.image ? (
+                    <Image src={event.data.image} alt={event.data.title} width={800} height={450} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center text-4xl text-muted-foreground">📅</div>
+                  )}
+                  <span class="absolute top-3 right-3 bg-muted text-muted-foreground text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full">Past</span>
+                </div>
+                <div class="p-5 flex flex-col gap-2 flex-1">
+                  <p class="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                    {event.data.date.toLocaleDateString("en-BW", { dateStyle: "long" })}
+                  </p>
+                  <h2 class="text-lg font-semibold text-foreground leading-snug">{event.data.title}</h2>
+                  <p class="text-sm text-muted-foreground leading-relaxed line-clamp-2">{event.data.description}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+
+    </div>
+  </div>
+</Layout>
+
+<style>
+  input[name="events-tab"] { display: none; }
+  .etab-panel { display: none; }
+
+  #etab-upcoming:checked ~ .etab-panels .panel-upcoming,
+  #etab-past:checked ~ .etab-panels .panel-past { display: block; }
+
+  #etab-upcoming:checked ~ .etab-bar label[for="etab-upcoming"],
+  #etab-past:checked ~ .etab-bar label[for="etab-past"] {
+    color: hsl(var(--foreground));
+    border-bottom-color: hsl(var(--foreground));
+    font-weight: 600;
+  }
+</style>

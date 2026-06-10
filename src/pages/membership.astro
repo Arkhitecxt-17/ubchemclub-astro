@@ -1,0 +1,42 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Membership" description="Join the University of Botswana Chemistry Club" wide>
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <section class="rounded-3xl border border-border bg-background p-8 sm:p-10 shadow-sm">
+      <div class="max-w-2xl">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary mb-3">Join UBCC</p>
+        <h1 class="text-4xl sm:text-5xl font-bold text-foreground leading-tight">Become part of a community that lives chemistry.</h1>
+        <p class="mt-5 text-lg leading-relaxed text-muted-foreground">
+          Membership is open to students who want to learn, collaborate, and take part in club
+          activities, events, and outreach. If you want to get involved, the fastest way is to
+          reach out through the contact form and introduce yourself.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="/contact" class="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground hover:opacity-85 transition-opacity">
+            Contact Us
+          </a>
+          <a href="/about" class="inline-flex items-center justify-center rounded-lg border-2 border-foreground px-6 py-3 font-semibold text-foreground hover:opacity-70 transition-opacity">
+            Learn About UBCC
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-10 grid gap-6 md:grid-cols-3">
+      <div class="rounded-2xl border border-border p-6 bg-background">
+        <h2 class="text-xl font-semibold text-foreground mb-2">Why join</h2>
+        <p class="text-muted-foreground leading-relaxed">Access events, networking, peer support, and opportunities tailored to chemistry students.</p>
+      </div>
+      <div class="rounded-2xl border border-border p-6 bg-background">
+        <h2 class="text-xl font-semibold text-foreground mb-2">Who can join</h2>
+        <p class="text-muted-foreground leading-relaxed">Any University of Botswana student with an interest in chemistry, science, or related fields.</p>
+      </div>
+      <div class="rounded-2xl border border-border p-6 bg-background">
+        <h2 class="text-xl font-semibold text-foreground mb-2">How to start</h2>
+        <p class="text-muted-foreground leading-relaxed">Send your name, email, and a short message through the contact page and we will follow up.</p>
+      </div>
+    </section>
+  </div>
+</Layout>

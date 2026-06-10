@@ -1,0 +1,61 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+const all = await getCollection("opportunities");
+const sorted = all.sort((a, b) => {
+  if (!a.data.deadline) return 1;
+  if (!b.data.deadline) return -1;
+  return a.data.deadline.getTime() - b.data.deadline.getTime();
+});
+---
+
+<Layout title="Opportunities" description="Scholarships, sponsorships and more for UBCC members" wide>
+  <div class="max-w-6xl mx-auto px-4 py-12">
+
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-foreground mb-3">Opportunities</h1>
+      <p class="text-muted-foreground text-lg">Scholarships, sponsorships, and other opportunities for chemistry students.</p>
+    </div>
+
+    {sorted.length === 0 ? (
+      <p class="text-center text-muted-foreground py-16">No opportunities posted yet. Check back soon.</p>
+    ) : (
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {sorted.map((opp) => {
+          const target = opp.data.link
+            ? opp.data.link
+            : opp.data.contact?.includes("@")
+            ? `mailto:${opp.data.contact}`
+            : opp.data.contact
+            ? `tel:${opp.data.contact}`
+            : "#";
+
+          const isExternal = !!opp.data.link;
+          const ctaLabel = opp.data.link ? "Visit →" : opp.data.contact?.includes("@") ? "Email →" : "Call →";
+
+          return (
+            <a
+              href={target}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              class="group flex flex-col border border-border rounded-xl p-6 hover:border-muted-foreground/50 hover:shadow-lg transition-all duration-200 no-underline text-inherit"
+            >
+              <div class="flex items-start justify-between gap-3 mb-4 flex-wrap">
+                <span class="bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full">{opp.data.type}</span>
+                {opp.data.deadline && (
+                  <span class="text-xs text-muted-foreground font-medium">
+                    Closes {opp.data.deadline.toLocaleDateString("en-BW", { dateStyle: "medium" })}
+                  </span>
+                )}
+              </div>
+              <h2 class="text-lg font-semibold text-foreground leading-snug mb-2">{opp.data.title}</h2>
+              <p class="text-sm text-muted-foreground leading-relaxed flex-1 line-clamp-3">{opp.data.description}</p>
+              <span class="mt-4 text-sm font-semibold text-primary group-hover:underline">{ctaLabel}</span>
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</Layout>

@@ -1,0 +1,209 @@
+---
+import IconMenu2 from "@tabler/icons/outline/menu-2.svg";
+import IconX from "@tabler/icons/outline/x.svg";
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+import { Image } from 'astro:assets';
+
+import ThemeSwitcher from "../../ThemeSwitcher.astro"
+
+import { Button } from "@/components/starwind/button";
+import { Separator } from "@/components/starwind/separator";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/starwind/sheet";
+
+/** Navigation link structure */
+export interface NavLink {
+  /** Display text for the link */
+  label: string;
+  /** URL the link points to */
+  href: string;
+  // Nested Links
+  children?: NavLink[]
+}
+
+interface Props extends HTMLAttributes<"nav"> {
+  /** Site name displayed when no logo slot is provided */
+  siteName?: string;
+  /** Array of navigation links */
+  links?: NavLink[];
+  /** Primary CTA button text */
+  ctaText?: string;
+  /** Primary CTA button href */
+  ctaHref?: string;
+}
+
+// you could also swap "sticky" for "fixed"
+const navStyles = tv({
+  base: "bg-background @container inset-x-0 top-0 z-50 border-b backdrop-blur",
+});
+
+const {
+  siteName = "UB Chemistry Club",
+  links = [
+  { label: "Home", href: "/" },
+  {
+    label: "About",
+    href: "/about",
+    children: [
+      { label: "History", href: "/about" },
+      { label: "Meet the Team", href: "/about#team" },
+      { label: "Vision & Mission", href: "/about#vision" },
+    ],
+  },
+  {
+    label: "Resources",
+    href: "#",
+    children: [
+      { label: "Events", href: "/events" },
+      { label: "Opportunities", href: "/opportunities" },
+      { label: "Newsletter", href: "/newsletter" },
+    ] 
+  },
+  { label: "Contact", href: "/contact" },
+  ],
+  ctaText = "Join Us",
+  ctaHref = "#",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const hasLogoSlot = Astro.slots.has("logo");
+
+const currentPath = Astro.url.pathname;
+
+const isActive = (href: string) => 
+  href === "/" ? currentPath === "/" : currentPath.startsWith(href);
+---
+
+<nav class={navStyles({ class: className })} {...rest}>
+  <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+    <!-- Logo / Site Name -->
+    <div class="flex shrink-0 items-center">
+      {
+        hasLogoSlot ? (
+          <slot name="logo" />
+        ) : (
+          <a href="/" class="flex items-center gap-2 text-xl font-semibold">
+            <Image src="/favicon.png"  alt="Logo" width={36} height={36}/>
+            {siteName}
+          </a>
+        )
+      }
+    </div>
+
+    <!-- Desktop Navigation Links -->
+    <div class="hidden items-center gap-1 @2xl:flex">
+      {
+        links.map((link) =>
+          link.children ? (
+            <div class="group relative">
+              <button class:list={["flex items-center gap-1 rounded-md px-3 py-2 text-md font-medium transition-colors",link.children.some(c => isActive(c.href)) ? "text-foreground font-semibold underline underline-offset-4" : "text-muted-foreground hover:text-foreground"]}>
+                {link.label}
+                <svg class="size-4 transition-transform group-hover:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="bg-background border-border invisible absolute top-full left-0 z-50 mt-1 min-w-40 rounded-md border p-1 opacity-0 shadow-md transition-all group-hover:visible group-hover:opacity-100">
+                {link.children.map((child) => (
+                  <a
+                    href={child.href}
+                    class="text-muted-foreground hover:text-foreground hover:bg-muted block rounded-md px-3 py-2 text-md transition-colors"
+                  >
+                    {child.label}
+                  </a>
+                ))}
+              </div>
+            </div>) : (
+            <a
+              href={link.href}
+              class:list={["rounded-md px-3 py-2 text-md font-medium transition-colors", isActive(link.href) ? "text-foreground font-semibold underline underline-offset-4" : "text-muted-foreground hover:text-foreground"]}
+            >
+              {link.label}
+            </a>
+          )
+        )
+      }
+      <ThemeSwitcher />
+    </div>
+
+    <!-- Desktop CTA Button -->
+    <!-- <div class="hidden @2xl:block">
+      <Button href={ctaHref}>{ctaText}</Button>
+      <ThemeSwitcher />
+    </div> -->
+
+    <!-- Mobile Menu Button -->
+    <div class="@2xl:hidden">
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" class="[&_svg]:size-8" aria-label="Open menu">
+            <IconMenu2 />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="right" class="max-w-70 sm:max-w-75">
+          <SheetHeader>
+            <SheetTitle>
+              {
+                hasLogoSlot ? (
+                  <slot name="logo" />
+                ) : (
+                  <span class="text-xl font-semibold">UB Chem Club</span>
+                  <ThemeSwitcher />
+                )
+              }
+            </SheetTitle>
+            <Separator class="mt-2" />
+          </SheetHeader>
+
+          <div class="-mt-5 flex flex-col px-4">
+            {
+              links.map((link) =>
+                link.children ? (
+                <details class="group">
+                  <summary class:list={["-mx-3 flex cursor-pointer list-none items-center justify-between rounded-md px-3 py-2 text-lg font-medium transition-colors", link.children.some(c => isActive(c.href)) ? "text-foreground font-semibold underline underline-offset-4" : "text-muted-foreground hover:text-foreground"]}>
+                    {link.label}
+                    <svg class="size-5 transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                  </summary>
+                  <div class="ml-3 flex flex-col border-l pl-3">
+                    {link.children.map((child) => (
+                      <SheetClose asChild>
+                        <a
+                        href={child.href}
+                          class:list={["-mx-3 rounded-md px-3 py-2 text-base transition-colors", isActive(child.href) ? "text-foreground font-semibold underline underline-offset-4" : "text-muted-foreground hover:text-foreground"]}
+                        >
+                          {child.label}
+                        </a>
+                      </SheetClose>
+                    ))}
+                  </div>
+                </details>
+              ) : (
+                <SheetClose asChild>
+                  <a
+                    href={link.href}
+                    class:list={["-mx-3 rounded-md px-3 py-2 text-lg font-medium transition-colors", isActive(link.href) ? "text-foreground font-semibold underline underline-offset-4" : "text-muted-foreground hover:text-foreground"]}
+                  >
+                    {link.label}
+                  </a>
+                </SheetClose>
+              )
+            )
+          }
+    </div>
+          <!-- <SheetFooter>
+            <SheetClose asChild>
+              <Button href={ctaHref} class="w-full">{ctaText}</Button>
+            </SheetClose>
+          </SheetFooter> -->
+          <IconX class="size-7" slot="icon" />
+        </SheetContent>
+      </Sheet>
+    </div>
+  </div>
+</nav>

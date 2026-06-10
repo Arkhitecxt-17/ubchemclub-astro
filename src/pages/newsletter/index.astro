@@ -1,0 +1,49 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import Layout from "../../layouts/Layout.astro";
+
+const issues = await getCollection("newsletter");
+const sorted = issues.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<Layout title="Newsletter" description="Download the latest UBCC newsletters" wide>
+  <div class="max-w-6xl mx-auto px-4 py-12">
+
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-foreground mb-3">Newsletter</h1>
+      <p class="text-muted-foreground text-lg">Stay informed with our latest issues. Download below.</p>
+    </div>
+
+    {sorted.length === 0 ? (
+      <p class="text-center text-muted-foreground py-16">No newsletters published yet.</p>
+    ) : (
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {sorted.map((issue) => (
+          <div class="flex flex-col border border-border rounded-xl overflow-hidden hover:border-muted-foreground/50 hover:shadow-lg transition-all duration-200">
+            <div class="aspect-[4/3] bg-muted overflow-hidden">
+              {issue.data.image ? (
+                <Image src={issue.data.image} alt={issue.data.title} width={400} height={300} class="w-full h-full object-cover" />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center text-5xl text-muted-foreground">📄</div>
+              )}
+            </div>
+            <div class="p-5 flex flex-col gap-2 flex-1">
+              <p class="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                {issue.data.date.toLocaleDateString("en-BW", { dateStyle: "long" })}
+              </p>
+              <h2 class="text-base font-semibold text-foreground leading-snug flex-1">{issue.data.title}</h2>
+              <a
+                href={issue.data.file}
+                download
+                class="mt-3 inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:opacity-85 transition-opacity"
+              >
+                Download PDF ↓
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</Layout>

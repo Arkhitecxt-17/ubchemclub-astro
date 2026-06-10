@@ -1,0 +1,68 @@
+backend:
+  name: github
+  repo: Arkhitecxt-17/ubchemclub-astro
+  branch: main
+  base_url: https://ubchemclub-astro.202101335.workers.dev
+  auth_endpoint: /api/auth/login
+
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: team
+    label: Team Members
+    folder: src/content/team
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Name, name: name, widget: string }
+      - { label: Role, name: role, widget: string }
+      - { label: Bio, name: bio, widget: text }
+      - { label: Photo, name: image, widget: image }
+
+  - name: events
+    label: Events
+    folder: src/content/events
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime }
+      - { label: Description, name: description, widget: markdown }
+      - { label: Cover Image, name: image, widget: image, required: false }
+      - label: Status
+        name: status
+        widget: select
+        options: [upcoming, past]
+
+  - name: opportunities
+    label: Opportunities
+    folder: src/content/opportunities
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Description, name: description, widget: markdown }
+      - { label: Deadline, name: deadline, widget: datetime, required: false }
+      - { label: Link, name: link, widget: string, required: false }
+
+  - name: newsletter
+    label: Newsletters
+    folder: src/content/newsletter
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Issue Date, name: date, widget: datetime }
+      - { label: PDF File, name: file, widget: file }
+
+  - name: home
+    label: Home Page
+    files:
+      - label: Home Content
+        name: home
+        file: src/content/settings/home.json
+        fields:
+          - { label: Hero Heading, name: heroHeading, widget: string }
+          - { label: Hero Subheading, name: heroSubheading, widget: text }
+          - { label: Hero Image, name: heroImage, widget: image }

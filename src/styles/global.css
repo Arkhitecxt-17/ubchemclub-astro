@@ -1,10 +1,11 @@
+@import "tailwindcss";
 /*
   The CSS in this style tag is based off of Bear Blog's default CSS.
   https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
   License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
  */
 
-:root {
+/* :root {
 	--accent: #2337ff;
 	--accent-dark: #000d8a;
 	--black: 15, 18, 25;
@@ -29,19 +30,50 @@
 	font-weight: 700;
 	font-style: normal;
 	font-display: swap;
-}
+}*/
+
 body {
 	font-family: "Atkinson", sans-serif;
 	margin: 0;
 	padding: 0;
 	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
+	/* background: linear-gradient(var(--gray-gradient)) no-repeat; */
 	background-size: 100% 600px;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
+	/* color: rgb(var(--gray-dark)); */
 	font-size: 20px;
 	line-height: 1.7;
+}
+
+/* Background logo annimation */
+.base-body::before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-image: url('/logo.webp');
+	background-size: cover;  /* Changed to use viewport height */
+	background-position: center;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	opacity: 0.12;  /* Slightly adjusted opacity */
+	z-index: -1;
+	animation: slowScroll 25s linear infinite;  /* Slower animation */
+}
+
+@keyframes slowScroll {
+	0% {
+		background-position: center 15%;
+	}
+	50% {
+		background-position: center 65%;  /* Reduced movement range */
+	}
+	100% {
+		background-position: center 15%;
+	}
 }
 main {
 	width: 720px;
@@ -56,7 +88,7 @@ h4,
 h5,
 h6 {
 	margin: 0 0 0.5rem 0;
-	color: rgb(var(--black));
+	/* color: rgb(var(--black)); */
 	line-height: 1.2;
 }
 h1 {
@@ -78,12 +110,12 @@ strong,
 b {
 	font-weight: 700;
 }
-a {
+/* a {
 	color: var(--accent);
 }
 a:hover {
 	color: var(--accent);
-}
+} */
 p {
 	margin-bottom: 1em;
 }
@@ -151,5 +183,5 @@ hr {
 	/* modern browsers, clip-path works inwards from each corner */
 	clip-path: inset(50%);
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
-	white-space: nowrap;
+	 white-space: nowrap;
 }
