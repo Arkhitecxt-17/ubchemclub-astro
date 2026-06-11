@@ -224,7 +224,7 @@ const bankDetails = {
 </Layout>
 
 <script>
-  const select = document.getElementById("membership_type") as HTMLSelectElement;
+  const select = document.getElementById("membership_type") as unknown as HTMLSelectElement;
   const titleField = document.getElementById("title-field");
   const studentFields = document.getElementById("student-fields");
   const staffFields = document.getElementById("staff-fields");

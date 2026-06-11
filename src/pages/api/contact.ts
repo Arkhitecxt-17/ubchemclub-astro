@@ -4,8 +4,9 @@ import type { APIRoute } from "astro";
 import { Resend } from "resend";
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const resend = new Resend((locals.runtime.env as any).RESEND_API_KEY);
-  const clubEmail = (locals.runtime.env as any).CLUB_EMAIL;
+  const env = (locals.runtime.env as any);
+  const resend = new Resend(env.RESEND_API_KEY);
+  const clubEmail = env.CLUB_EMAIL;
 
   const form = await request.formData();
   const name = form.get("name")?.toString().trim();
@@ -14,7 +15,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const message = form.get("message")?.toString().trim();
 
   if (!name || !email || !subject || !message) {
-    return new Response("Missing fields", { status: 400 });
+    return Response.redirect(new URL("/contact?error=missing", request.url), 302);
   }
 
   try {
@@ -25,23 +26,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
       subject: `Contact Form: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, "<br>")}</p>
+        <table style="border-collapse:collapse;width:100%">
+          <tr><td style="padding:8px;border:1px solid #eee"><strong>Name</strong></td><td style="padding:8px;border:1px solid #eee">${name}</td></tr>
+          <tr><td style="padding:8px;border:1px solid #eee"><strong>Email</strong></td><td style="padding:8px;border:1px solid #eee">${email}</td></tr>
+          <tr><td style="padding:8px;border:1px solid #eee"><strong>Subject</strong></td><td style="padding:8px;border:1px solid #eee">${subject}</td></tr>
+          <tr><td style="padding:8px;border:1px solid #eee"><strong>Message</strong></td><td style="padding:8px;border:1px solid #eee">${message.replace(/\n/g, "<br>")}</td></tr>
+        </table>
       `,
     });
 
-    return Response.redirect(
-      new URL("/contact?submitted=true", request.url),
-      302
-    );
+    return Response.redirect(new URL("/contact?submitted=true", request.url), 302);
   } catch (err) {
     console.error("Email error:", err);
-    return Response.redirect(
-      new URL("/contact?error=true", request.url),
-      302
-    );
+    return Response.redirect(new URL("/contact?error=true", request.url), 302);
   }
-};  
+};
