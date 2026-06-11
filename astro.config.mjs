@@ -20,6 +20,8 @@ export default defineConfig({
         platformProxy: {
             enabled: true,
         },
+        imageService: { build: 'compile', runtime: 'cloudflare-binding' },
+    sessionKVBindingName: 'SESSION',
     }),
     vite: {
         plugins: [tailwindcss()],

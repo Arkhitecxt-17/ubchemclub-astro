@@ -3,7 +3,7 @@ import { getCollection } from "astro:content";
 import { Image } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
 
-const allEvents = await getCollection("events");
+const allEvents = (await getCollection("events").catch(() => []));
 const upcoming = allEvents
   .filter((e) => e.data.status === "upcoming")
   .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());

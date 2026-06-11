@@ -4,7 +4,7 @@ import { Image } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
 
 export async function getStaticPaths() {
-  const events = await getCollection("events");
+  const events = (await getCollection("events").catch(() => []));
   return events.map((event) => ({ params: { id: event.id } }));
 }
 

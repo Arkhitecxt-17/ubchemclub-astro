@@ -14,7 +14,7 @@ const blog = defineCollection({
 });
 
 const team = defineCollection({
-  loader: glob({ base: "./src/content/team", pattern: "**/*.{md,json}" }),
+  loader: glob({ base: "./src/content/team", pattern: "**/*.{md,mdx}" }),
   schema: z.object({
     name: z.string(),
     role: z.string(),

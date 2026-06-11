@@ -42,7 +42,7 @@ interface Props extends HTMLAttributes<"nav"> {
 
 // you could also swap "sticky" for "fixed"
 const navStyles = tv({
-  base: "bg-background @container inset-x-0 top-0 z-50 border-b backdrop-blur",
+  base: "bg-background sticky @container inset-x-0 top-0 z-100 border-b backdrop-blur",
 });
 
 const {
@@ -104,12 +104,12 @@ const isActive = (href: string) =>
       {
         links.map((link) =>
           link.children ? (
-            <div class="group relative">
+            <div class="group relative z-50">
               <button class:list={["flex items-center gap-1 rounded-md px-3 py-2 text-md font-medium transition-colors",link.children.some(c => isActive(c.href)) ? "text-foreground font-semibold underline underline-offset-4" : "text-muted-foreground hover:text-foreground"]}>
                 {link.label}
                 <svg class="size-4 transition-transform group-hover:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
               </button>
-              <div class="bg-background border-border invisible absolute top-full left-0 z-50 mt-1 min-w-40 rounded-md border p-1 opacity-0 shadow-md transition-all group-hover:visible group-hover:opacity-100">
+              <div class="bg-background border-border invisible absolute top-full left-0 z-200 mt-1 min-w-40 rounded-md border p-1 opacity-0 shadow-md transition-all group-hover:visible group-hover:opacity-100">
                 {link.children.map((child) => (
                   <a
                     href={child.href}

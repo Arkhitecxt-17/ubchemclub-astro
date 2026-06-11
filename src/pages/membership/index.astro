@@ -1,0 +1,202 @@
+---
+export const prerender = false;
+import Layout from "../../layouts/Layout.astro";
+
+const submitted = Astro.url.searchParams.get("submitted");
+const error = Astro.url.searchParams.get("error");
+
+const membershipTypes = [
+  { value: "undergraduate", label: "Undergraduate Student", price: "P50" },
+  { value: "postgraduate", label: "Postgraduate Student", price: "P120" },
+  { value: "alumni", label: "Alumni", price: "P120" },
+  { value: "staff", label: "Staff / Lecturer", price: "P150" },
+  { value: "corporate", label: "Corporate", price: "P300" },
+];
+
+const bankDetails = {
+  bank: "First National Bank (FNB)",
+  accountName: "UB Chemistry Club",
+  accountNumber: "XXXXXXXXXXXXXXX",
+  branch: "Main Branch",
+  reference: "Your Full Name + Membership Type",
+};
+---
+
+<Layout title="Join Us" description="Become a member of the University of Botswana Chemistry Club" wide>
+  <div class="max-w-3xl mx-auto px-4 py-12">
+
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-bold text-foreground mb-3">Become a Member</h1>
+      <p class="text-muted-foreground text-lg">Join the University of Botswana Chemistry Club and be part of a growing community of chemistry enthusiasts.</p>
+    </div>
+
+    {submitted === "true" ? (
+      <div class="flex flex-col items-center gap-4 p-10 border border-border rounded-2xl text-center">
+        <span class="text-5xl">✅</span>
+        <h2 class="text-2xl font-semibold text-foreground">Application Received!</h2>
+        <p class="text-muted-foreground">Thank you for applying. We will review your proof of payment and get back to you within 3-5 business days.</p>
+        <a href="/" class="mt-2 px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-85 transition-opacity">Back to Home</a>
+      </div>
+    ) : (
+      <div class="flex flex-col gap-10">
+
+        <!-- Membership Types -->
+        <div>
+          <h2 class="text-2xl font-semibold text-foreground mb-4">Membership Types</h2>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {membershipTypes.map((type) => (
+              <div class="border border-border rounded-xl p-5 flex flex-col gap-2">
+                <span class="text-2xl font-bold text-primary">{type.price}</span>
+                <span class="text-base font-semibold text-foreground">{type.label}</span>
+                <span class="text-xs text-muted-foreground uppercase tracking-wide">per year</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Benefits -->
+        <div class="border border-border rounded-xl p-6">
+          <h2 class="text-xl font-semibold text-foreground mb-4">Member Benefits</h2>
+          <ul class="space-y-2 text-muted-foreground">
+            {[
+              "Access to exclusive workshops and seminars",
+              "Networking with industry professionals",
+              "Access to club resources and newsletters",
+              "Priority registration for club events",
+              "Certificate of membership",
+              "Opportunities for leadership roles",
+            ].map((benefit) => (
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-0.5">✓</span>
+                {benefit}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Payment Instructions -->
+        <div class="border border-border rounded-xl p-6 bg-muted/30">
+          <h2 class="text-xl font-semibold text-foreground mb-3">How to Pay</h2>
+          <ol class="space-y-2 text-muted-foreground list-decimal list-inside">
+            <li>Choose your membership type above and note the fee.</li>
+            <li>Make a bank transfer to the account below.</li>
+            <li>Save your proof of payment (screenshot or PDF).</li>
+            <li>Fill in the registration form below and upload your proof.</li>
+          </ol>
+          <div class="mt-4 grid gap-2 text-sm">
+            <div class="flex gap-2"><span class="font-medium text-foreground w-36">Bank:</span><span class="text-muted-foreground">{bankDetails.bank}</span></div>
+            <div class="flex gap-2"><span class="font-medium text-foreground w-36">Account Name:</span><span class="text-muted-foreground">{bankDetails.accountName}</span></div>
+            <div class="flex gap-2"><span class="font-medium text-foreground w-36">Account Number:</span><span class="text-muted-foreground">{bankDetails.accountNumber}</span></div>
+            <div class="flex gap-2"><span class="font-medium text-foreground w-36">Branch:</span><span class="text-muted-foreground">{bankDetails.branch}</span></div>
+            <div class="flex gap-2"><span class="font-medium text-foreground w-36">Reference:</span><span class="text-muted-foreground">{bankDetails.reference}</span></div>
+          </div>
+        </div>
+
+        <!-- Error message -->
+        {error && (
+          <div class="border border-error/40 bg-error/10 text-error-foreground rounded-xl p-4 text-sm">
+            {error === "missing" && "Please fill in all required fields."}
+            {error === "upload" && "Failed to upload proof of payment. Please try again."}
+            {error === "db" && "Failed to save your application. Please try again."}
+          </div>
+        )}
+
+        <!-- Registration Form -->
+        <div>
+          <h2 class="text-2xl font-semibold text-foreground mb-6">Registration Form</h2>
+          <form method="POST" action="/api/membership" enctype="multipart/form-data" class="flex flex-col gap-5" id="membership-form">
+
+            <div class="flex flex-col gap-1.5">
+              <label for="full_name" class="text-sm font-medium text-foreground">Full Name <span class="text-error">*</span></label>
+              <input type="text" id="full_name" name="full_name" required placeholder="Your full name"
+                class="px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-foreground/40 transition-colors" />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="email" class="text-sm font-medium text-foreground">Email Address <span class="text-error">*</span></label>
+              <input type="email" id="email" name="email" required placeholder="you@example.com"
+                class="px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-foreground/40 transition-colors" />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="phone" class="text-sm font-medium text-foreground">Phone Number <span class="text-error">*</span></label>
+              <input type="tel" id="phone" name="phone" required placeholder="+267 7X XXX XXX"
+                class="px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-foreground/40 transition-colors" />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="membership_type" class="text-sm font-medium text-foreground">Membership Type <span class="text-error">*</span></label>
+              <select id="membership_type" name="membership_type" required
+                class="px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:border-foreground/40 transition-colors">
+                <option value="" disabled selected>Select a membership type</option>
+                {membershipTypes.map((type) => (
+                  <option value={type.value}>{type.label} — {type.price}/year</option>
+                ))}
+              </select>
+            </div>
+
+            <!-- Student fields (shown for undergrad/postgrad) -->
+            <div id="student-fields" class="hidden flex-col gap-5">
+              <div class="flex flex-col gap-1.5">
+                <label for="student_id" class="text-sm font-medium text-foreground">Student ID</label>
+                <input type="text" id="student_id" name="student_id" placeholder="e.g. 202101335"
+                  class="px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-foreground/40 transition-colors" />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label for="institution" class="text-sm font-medium text-foreground">Institution</label>
+                <input type="text" id="institution" name="institution" placeholder="University of Botswana"
+                  class="px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-foreground/40 transition-colors" />
+              </div>
+            </div>
+
+            <!-- Corporate fields -->
+            <div id="corporate-fields" class="hidden flex-col gap-5">
+              <div class="flex flex-col gap-1.5">
+                <label for="company_name" class="text-sm font-medium text-foreground">Company Name</label>
+                <input type="text" id="company_name" name="company_name" placeholder="Your company name"
+                  class="px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-foreground/40 transition-colors" />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label for="contact_person" class="text-sm font-medium text-foreground">Contact Person</label>
+                <input type="text" id="contact_person" name="contact_person" placeholder="Primary contact name"
+                  class="px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-foreground/40 transition-colors" />
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="proof_of_payment" class="text-sm font-medium text-foreground">Proof of Payment <span class="text-error">*</span></label>
+              <p class="text-xs text-muted-foreground">Upload a screenshot or PDF of your bank transfer. Max 5MB.</p>
+              <input type="file" id="proof_of_payment" name="proof_of_payment" required accept="image/*,.pdf"
+                class="px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:border-foreground/40 transition-colors file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:opacity-85" />
+            </div>
+
+            <button type="submit"
+              class="self-start px-8 py-3 bg-primary text-primary-foreground font-semibold rounded-lg text-base hover:opacity-85 transition-opacity cursor-pointer">
+              Submit Application
+            </button>
+
+          </form>
+        </div>
+
+      </div>
+    )}
+  </div>
+</Layout>
+
+<script>
+  const select = document.getElementById("membership_type") as unknown as HTMLSelectElement;
+  const studentFields = document.getElementById("student-fields");
+  const corporateFields = document.getElementById("corporate-fields");
+
+  function updateFields() {
+    const val = select.value;
+    const isStudent = val === "undergraduate" || val === "postgraduate";
+    const isCorporate = val === "corporate";
+
+    studentFields?.classList.toggle("hidden", !isStudent);
+    corporateFields?.classList.toggle("hidden", !isCorporate);
+  }
+
+  select?.addEventListener("change", updateFields);
+  updateFields();
+</script>

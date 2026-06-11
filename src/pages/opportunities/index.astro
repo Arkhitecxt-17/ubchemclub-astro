@@ -2,7 +2,7 @@
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
-const all = await getCollection("opportunities");
+const all = (await getCollection("opportunities").catch(() => []));
 const sorted = all.sort((a, b) => {
   if (!a.data.deadline) return 1;
   if (!b.data.deadline) return -1;

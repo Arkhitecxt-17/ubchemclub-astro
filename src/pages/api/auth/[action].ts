@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro";
 
+export const prerender = false;
+
 const GITHUB_CLIENT_ID = import.meta.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = import.meta.env.GITHUB_CLIENT_SECRET;
 const BASE_URL = import.meta.env.SITE_URL;
