@@ -20,6 +20,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const institution = form.get("institution")?.toString().trim() || null;
   const companyName = form.get("company_name")?.toString().trim() || null;
   const contactPerson = form.get("contact_person")?.toString().trim() || null;
+  const title = form.get("title")?.toString().trim() || null;
+  const staffRole = form.get("staff_role")?.toString().trim() || null;
   const proofFile = form.get("proof_of_payment") as File | null;
 
   if (!fullName || !email || !phone || !membershipType || !proofFile) {
@@ -44,9 +46,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   // Save to D1
   try {
     await db.prepare(
-      `INSERT INTO memberships (full_name, email, phone, membership_type, student_id, institution, company_name, contact_person, proof_of_payment)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).bind(fullName, email, phone, membershipType, studentId, institution, companyName, contactPerson, proofUrl).run();
+      `INSERT INTO memberships (full_name, email, phone, membership_type, title, student_id, institution, company_name, contact_person, staff_role, proof_of_payment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(fullName, email, phone, membershipType, title, studentId, institution, companyName, contactPerson, staffRole, proofUrl).run();
   } catch (err) {
     console.error("D1 error:", err);
     return Response.redirect(new URL("/membership?error=db", request.url), 302);
@@ -84,4 +84,4 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   return Response.redirect(new URL("/membership?submitted=true", request.url), 302);
-};
+};  
