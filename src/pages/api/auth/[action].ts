@@ -3,10 +3,10 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async ({ params, url, locals }) => {
-  const env = (locals.runtime.env as any);
-  const GITHUB_CLIENT_ID = env.GITHUB_CLIENT_ID;
-  const GITHUB_CLIENT_SECRET = env.GITHUB_CLIENT_SECRET;
-  const BASE_URL = env.SITE_URL;
+  const runtime = (locals as any).runtime;
+  const GITHUB_CLIENT_ID = runtime?.env?.GITHUB_CLIENT_ID ?? import.meta.env.GITHUB_CLIENT_ID;
+  const GITHUB_CLIENT_SECRET = runtime?.env?.GITHUB_CLIENT_SECRET ?? import.meta.env.GITHUB_CLIENT_SECRET;
+  const BASE_URL = runtime?.env?.SITE_URL ?? import.meta.env.SITE_URL;
 
   const action = params.action;
 
@@ -44,8 +44,10 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
     };
 
     if (!tokenData.access_token) {
-      return new Response(`OAuth failed: ${tokenData.error}`, { status: 401 });
+      return new Response(`OAuth failed: ${tokenData.error ?? "unknown"}`, { status: 401 });
     }
+
+    const token = tokenData.access_token;
 
     const html = `<!DOCTYPE html>
 <html>
@@ -55,7 +57,7 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       (function() {
         function receiveMessage(e) {
           window.opener.postMessage(
-            'authorization:github:success:${JSON.stringify({ token: tokenData.access_token, provider: "github" })}',
+            'authorization:github:success:{"token":"${token}","provider":"github"}',
             e.origin
           );
         }
