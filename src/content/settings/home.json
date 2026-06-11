@@ -1,5 +1,16 @@
-{
-  "heroImage": "/uploads/chatgpt-image-may-20-2026-12_32_21-am.png",
-  "heroHeading": "Inspiring Chemists and Fostering Innovation",
-  "heroSubheading": "The University of Botswana Chemistry Club brings together students passionate about chemistry through events, research, and community."
-}
+[
+  {
+    "id": "home",
+    "heroHeading": "Inspiring the Next Generation of Chemists",
+    "heroSubheading": "The University of Botswana Chemistry Club brings together students passionate about chemistry through events, research, and community.",
+    "heroImages": [],
+    "aboutHeading": "Who We Are",
+    "aboutText": "The UBCC is a student-led organisation at the University of Botswana dedicated to fostering a love of chemistry through academic and social activities.",
+    "statsItems": [
+      { "label": "Members", "value": "100+" },
+      { "label": "Events per Year", "value": "12+" },
+      { "label": "Years Active", "value": "1+" },
+      { "label": "Opportunities Shared", "value": "20+" }
+    ]
+  }
+]

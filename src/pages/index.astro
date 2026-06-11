@@ -1,50 +1,219 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import BaseHead from "../components/BaseHead.astro";
+import Navbar1 from "../components/starwind-pro/navbar-01/Navbar1.astro";
+import Footer1 from "../components/starwind-pro/footer-01/Footer1.astro";
+import "../styles/starwind.css";
+
+const homeData = await getCollection("home").then((c) => c[0]?.data);
+const upcomingEvents = await getCollection("events").then((c) =>
+  c.filter((e) => e.data.status === "upcoming")
+    .sort((a, b) => a.data.date.getTime() - b.data.date.getTime())
+    .slice(0, 3)
+);
+const latestOpportunities = await getCollection("opportunities").then((c) =>
+  c.sort((a, b) => {
+    if (!a.data.deadline) return 1;
+    if (!b.data.deadline) return -1;
+    return a.data.deadline.getTime() - b.data.deadline.getTime();
+  }).slice(0, 3)
+);
+
+const heroImages = homeData?.heroImages ?? [];
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to <a href="https://docs.astro.build/"
-					>read the docs
-				</a> or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out <a
-					href="https://github.com/Charca/astro-blog-template"
-					>astro-blog-template
-				</a> by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead
+      title={homeData?.heroHeading ?? "UBCC — University of Botswana Chemistry Club"}
+      description={homeData?.heroSubheading ?? "University of Botswana Chemistry Club"}
+    />
+  </head>
+  <body class="base-body bg-background text-foreground">
+    <Navbar1 />
+    <main>
+
+      <!-- Hero -->
+      <section class="relative h-[90vh] min-h-[500px] overflow-hidden bg-muted" id="hero">
+        <div id="hero-slides" class="relative w-full h-full">
+          {heroImages.length === 0 ? (
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-6 bg-muted">
+              <div class="absolute inset-0 bg-black/45"></div>
+              <div class="relative z-10 flex flex-col items-center gap-4 text-white max-w-3xl">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight [text-shadow:0_2px_8px_rgba(0,0,0,0.4)]">
+                  {homeData?.heroHeading ?? "Inspiring the Next Generation of Chemists"}
+                </h1>
+                <p class="text-lg sm:text-xl opacity-90 max-w-xl [text-shadow:0_1px_4px_rgba(0,0,0,0.3)]">
+                  {homeData?.heroSubheading ?? "University of Botswana Chemistry Club"}
+                </p>
+                <div class="flex gap-4 flex-wrap justify-center mt-2">
+                  <a href="/membership" class="px-7 py-3 bg-primary text-primary-foreground font-semibold rounded-lg text-base hover:opacity-85 transition-opacity">Join Us</a>
+                  <a href="/about" class="px-7 py-3 border-2 border-white text-white font-semibold rounded-lg text-base hover:opacity-70 transition-opacity">Learn More</a>
+                </div>
+              </div>
+            </div>
+          ) : (
+            heroImages.map((src, i) => (
+              <div class={`hero-slide absolute inset-0 transition-opacity duration-700 ${i === 0 ? "opacity-100" : "opacity-0"}`}>
+                <Image src={src} alt={`Hero image ${i + 1}`} width={1920} height={1080} class="w-full h-full object-cover" />
+                <div class="absolute inset-0 bg-black/45"></div>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+                  <div class="flex flex-col items-center gap-4 text-white max-w-3xl">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight [text-shadow:0_2px_8px_rgba(0,0,0,0.4)]">
+                      {homeData?.heroHeading}
+                    </h1>
+                    <p class="text-lg sm:text-xl opacity-90 max-w-xl [text-shadow:0_1px_4px_rgba(0,0,0,0.3)]">
+                      {homeData?.heroSubheading}
+                    </p>
+                    <div class="flex gap-4 flex-wrap justify-center mt-2">
+                      <a href="/membership" class="px-7 py-3 bg-primary text-primary-foreground font-semibold rounded-lg text-base hover:opacity-85 transition-opacity">Join Us</a>
+                      <a href="/about" class="px-7 py-3 border-2 border-white text-white font-semibold rounded-lg text-base hover:opacity-70 transition-opacity">Learn More</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {heroImages.length > 1 && (
+          <>
+            <button id="hero-prev" aria-label="Previous" class="absolute left-0 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/55 text-white text-5xl px-4 py-3 rounded-r-lg border-none cursor-pointer transition-colors leading-none">‹</button>
+            <button id="hero-next" aria-label="Next" class="absolute right-0 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/55 text-white text-5xl px-4 py-3 rounded-l-lg border-none cursor-pointer transition-colors leading-none">›</button>
+            <div id="hero-dots" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+              {heroImages.map((_, i) => (
+                <button data-index={i} aria-label={`Slide ${i + 1}`}
+                  class={`hero-dot w-2.5 h-2.5 rounded-full border-none cursor-pointer p-0 transition-opacity ${i === 0 ? "bg-white opacity-100" : "bg-white opacity-40"}`} />
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+
+      <!-- Stats -->
+      {homeData?.statsItems && (
+        <section class="bg-primary text-primary-foreground py-12 px-4">
+          <div class="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            {homeData.statsItems.map((stat) => (
+              <div class="flex flex-col gap-1">
+                <span class="text-4xl font-bold leading-none">{stat.value}</span>
+                <span class="text-sm font-medium uppercase tracking-wide opacity-85">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- About snippet -->
+      <section class="py-20 px-4">
+        <div class="max-w-2xl mx-auto text-center flex flex-col items-center gap-4">
+          <h2 class="text-3xl sm:text-4xl font-bold text-foreground">{homeData?.aboutHeading ?? "Who We Are"}</h2>
+          <p class="text-muted-foreground text-lg leading-relaxed">{homeData?.aboutText}</p>
+          <a href="/about" class="mt-2 px-6 py-3 border-2 border-foreground text-foreground font-semibold rounded-lg hover:opacity-70 transition-opacity">Read More</a>
+        </div>
+      </section>
+
+      <!-- Upcoming Events -->
+      <section class="py-16 px-4 bg-muted/40">
+        <div class="max-w-5xl mx-auto">
+          <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-foreground">Upcoming Events</h2>
+            <a href="/events" class="text-sm font-semibold text-primary hover:underline">See all →</a>
+          </div>
+          {upcomingEvents.length === 0 ? (
+            <p class="text-muted-foreground py-8">No upcoming events at the moment.</p>
+          ) : (
+            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {upcomingEvents.map((event) => (
+                <a href={`/events/${event.id}`} class="group flex flex-col border border-border rounded-xl overflow-hidden hover:border-muted-foreground/40 hover:shadow-md transition-all duration-200 no-underline text-inherit bg-background">
+                  <div class="aspect-video bg-muted overflow-hidden">
+                    {event.data.image ? (
+                      <Image src={event.data.image} alt={event.data.title} width={800} height={450} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    ) : (
+                      <div class="w-full h-full flex items-center justify-center text-3xl text-muted-foreground">📅</div>
+                    )}
+                  </div>
+                  <div class="p-4 flex flex-col gap-1">
+                    <p class="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                      {event.data.date.toLocaleDateString("en-BW", { dateStyle: "medium" })}
+                    </p>
+                    <h3 class="text-base font-semibold text-foreground leading-snug">{event.data.title}</h3>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <!-- Opportunities -->
+      <section class="py-16 px-4">
+        <div class="max-w-5xl mx-auto">
+          <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-foreground">Opportunities</h2>
+            <a href="/opportunities" class="text-sm font-semibold text-primary hover:underline">See all →</a>
+          </div>
+          {latestOpportunities.length === 0 ? (
+            <p class="text-muted-foreground py-8">No opportunities posted yet.</p>
+          ) : (
+            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {latestOpportunities.map((opp) => (
+                <div class="flex flex-col border border-border rounded-xl p-5 bg-background gap-2">
+                  <span class="self-start bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full">{opp.data.type}</span>
+                  <h3 class="text-base font-semibold text-foreground leading-snug">{opp.data.title}</h3>
+                  {opp.data.deadline && (
+                    <p class="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+                      Closes {opp.data.deadline.toLocaleDateString("en-BW", { dateStyle: "medium" })}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <!-- Newsletter CTA -->
+      <section class="py-20 px-4 bg-primary text-primary-foreground text-center">
+        <div class="max-w-xl mx-auto flex flex-col items-center gap-4">
+          <h2 class="text-3xl sm:text-4xl font-bold">Stay in the Loop</h2>
+          <p class="text-lg opacity-90 leading-relaxed">Download our latest newsletter and never miss an update from the Chemistry Club.</p>
+          <a href="/newsletter" class="mt-2 px-7 py-3 bg-white text-primary font-semibold rounded-lg hover:opacity-85 transition-opacity">View Newsletters</a>
+        </div>
+      </section>
+
+    </main>
+    <Footer1 />
+
+    {heroImages.length > 1 && (
+      <script>
+        const slides = document.querySelectorAll<HTMLElement>(".hero-slide");
+        const dots = document.querySelectorAll<HTMLElement>(".hero-dot");
+        let current = 0;
+        let timer: ReturnType<typeof setInterval>;
+
+        function goTo(index: number) {
+          slides[current].classList.replace("opacity-100", "opacity-0");
+          dots[current]?.classList.replace("opacity-100", "opacity-40");
+          current = (index + slides.length) % slides.length;
+          slides[current].classList.replace("opacity-0", "opacity-100");
+          dots[current]?.classList.replace("opacity-40", "opacity-100");
+        }
+
+        function startTimer() { timer = setInterval(() => goTo(current + 1), 5000); }
+        function resetTimer() { clearInterval(timer); startTimer(); }
+
+        dots.forEach((dot) => {
+          dot.addEventListener("click", () => { goTo(Number(dot.dataset.index)); resetTimer(); });
+        });
+
+        document.getElementById("hero-prev")?.addEventListener("click", () => { goTo(current - 1); resetTimer(); });
+        document.getElementById("hero-next")?.addEventListener("click", () => { goTo(current + 1); resetTimer(); });
+
+        startTimer();
+      </script>
+    )}
+  </body>
 </html>

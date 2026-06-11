@@ -1,0 +1,96 @@
+---
+export const prerender = false;
+import BaseHead from "../../components/BaseHead.astro";
+import "../../styles/starwind.css";
+
+const env = ((Astro.locals as any).runtime.env as any);
+const db = env.DB;
+
+const result = await db.prepare(
+  "SELECT * FROM memberships ORDER BY created_at DESC"
+).all();
+
+const members = result.results ?? [];
+
+// CSV export
+if (Astro.url.searchParams.get("export") === "csv") {
+  const headers = ["id", "created_at", "full_name", "email", "phone", "membership_type", "student_id", "institution", "company_name", "contact_person", "status"];
+  const rows = members.map((m: any) =>
+    headers.map((h) => `"${(m[h] ?? "").toString().replace(/"/g, '""')}"`).join(",")
+  );
+  const csv = [headers.join(","), ...rows].join("\n");
+  return new Response(csv, {
+    headers: {
+      "Content-Type": "text/csv",
+      "Content-Disposition": "attachment; filename=members.csv",
+    },
+  });
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <BaseHead title="Members Admin" description="Membership applications" />
+  </head>
+  <body class="bg-background text-foreground min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 py-10">
+
+      <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-foreground">Membership Applications</h1>
+          <p class="text-muted-foreground mt-1">{members.length} total application{members.length !== 1 ? "s" : ""}</p>
+        </div>
+        <a href="?export=csv"
+          class="px-5 py-2.5 bg-primary text-primary-foreground font-semibold rounded-lg text-sm hover:opacity-85 transition-opacity">
+          Export CSV ↓
+        </a>
+      </div>
+
+      {members.length === 0 ? (
+        <div class="text-center py-20 text-muted-foreground">No applications yet.</div>
+      ) : (
+        <div class="overflow-x-auto rounded-xl border border-border">
+          <table class="w-full text-sm">
+            <thead class="bg-muted/60 border-b border-border">
+              <tr>
+                {["Date", "Name", "Email", "Phone", "Type", "Student ID", "Institution", "Company", "Contact Person", "Proof", "Status"].map((h) => (
+                  <th class="px-4 py-3 text-left font-semibold text-foreground whitespace-nowrap">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border">
+              {members.map((m: any) => (
+                <tr class="hover:bg-muted/30 transition-colors">
+                  <td class="px-4 py-3 text-muted-foreground whitespace-nowrap">{new Date(m.created_at).toLocaleDateString("en-BW")}</td>
+                  <td class="px-4 py-3 font-medium text-foreground whitespace-nowrap">{m.full_name}</td>
+                  <td class="px-4 py-3 text-muted-foreground">{m.email}</td>
+                  <td class="px-4 py-3 text-muted-foreground whitespace-nowrap">{m.phone}</td>
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="bg-primary/10 text-primary text-xs font-semibold px-2 py-1 rounded-full capitalize">{m.membership_type}</span>
+                  </td>
+                  <td class="px-4 py-3 text-muted-foreground">{m.student_id ?? "—"}</td>
+                  <td class="px-4 py-3 text-muted-foreground">{m.institution ?? "—"}</td>
+                  <td class="px-4 py-3 text-muted-foreground">{m.company_name ?? "—"}</td>
+                  <td class="px-4 py-3 text-muted-foreground">{m.contact_person ?? "—"}</td>
+                  <td class="px-4 py-3">
+                    <a href={`/api/proof/${m.proof_of_payment}`} target="_blank"
+                      class="text-primary text-xs font-medium hover:underline">View ↗</a>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class:list={["text-xs font-semibold px-2 py-1 rounded-full capitalize",
+                      m.status === "approved" ? "bg-success/20 text-success-foreground" :
+                      m.status === "rejected" ? "bg-error/20 text-error-foreground" :
+                      "bg-warning/20 text-warning-foreground"
+                    ]}>{m.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+    </div>
+  </body>
+</html>
