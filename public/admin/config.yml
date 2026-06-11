@@ -4,8 +4,8 @@ backend:
   name: github
   repo: Arkhitecxt-17/ubchemclub-astro
   branch: main
-  base_url: https://ubchemclub-astro.202101335.workers.dev
-  auth_endpoint: /api/auth/login
+  base_url: https://ubcc-decap-proxy.202101335.workers.dev
+  auth_endpoint: /auth
 
 media_folder: public/uploads
 public_folder: /uploads
